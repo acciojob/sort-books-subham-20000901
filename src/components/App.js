@@ -93,6 +93,6 @@ const App = () => {
       </tbody>
     </table>
   </div>
-);
+)};
 
 export default App;
