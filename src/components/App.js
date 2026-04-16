@@ -1,63 +1,69 @@
-
-import React,{useEffect} from "react";
-import {useSelector, useDispatch} from 'react-redux';
-import { setOrder,setSortBy,fetchBooks } from "../State/bookSlice";
-import './../styles/App.css';
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setOrder, setSortBy, fetchBooks } from "../State/bookSlice";
 
 const App = () => {
-  const {list,loading,error,sortBy,order} = useSelector((state) => state.books);
+  const { list, loading, error, sortBy, order } = useSelector(
+    (state) => state.books
+  );
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchBooks());
-  },[dispatch]);
+  }, [dispatch]);
 
-  const sortedBooks = [...list].sort((a,b) => {
-    const infoA = a.volumeInfo || {};
-    const infoB = b.volumeInfo || {};
-     
-    let valA = "";
-    let valB = "";
+  const sortedBooks = [...(list || [])]
+    .filter((book) => book?.volumeInfo)
+    .sort((a, b) => {
+      const infoA = a.volumeInfo || {};
+      const infoB = b.volumeInfo || {};
 
-    if(sortBy === 'title') {
-       valA = infoA.title || "";
-       valB = infoB.title || "";
-    }else if(sortBy === 'author'){
-       valA = (infoA.authors && infoA.authors[0]) || "";
-      valB = (infoB.authors && infoB.authors[0]) || "";
+      let valA = "";
+      let valB = "";
 
-    }else{
-      valA = infoA.publisher || "";
-      valB = infoB.publisher || "";
-    }
+      if (sortBy === "title") {
+        valA = infoA.title || "";
+        valB = infoB.title || "";
+      } else if (sortBy === "author") {
+        valA = (infoA.authors && infoA.authors[0]) || "";
+        valB = (infoB.authors && infoB.authors[0]) || "";
+      } else {
+        valA = infoA.publisher || "";
+        valB = infoB.publisher || "";
+      }
 
-    return order === "asc"
-      ? valA.localeCompare(valB)
-      : valB.localeCompare(valA);
-  });
+      return order === "asc"
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    });
 
   return (
     <div>
-       <h1>Books List</h1>
+      <h1>Books List</h1>
 
-      <label>Sort By</label>
-      <select
-        value={sortBy}
-        onChange={(e) => dispatch(setSortBy(e.target.value))}
-      >
-        <option value="title">Title</option>
-        <option value="author">Author</option>
-        <option value="publisher">Publisher</option>
-      </select>
+      <div>
+        <label>Sort by:</label>
+        <select
+          value={sortBy}
+          onChange={(e) => dispatch(setSortBy(e.target.value))}
+        >
+          <option value="title">Title</option>
+          <option value="author">Author</option>
+          <option value="publisher">Publisher</option>
+        </select>
+      </div>
 
-      <label>Order</label>
-      <select
-        value={order}
-        onChange={(e) => dispatch(setOrder(e.target.value))}
-      >
-        <option value="asc">Ascending</option>
-        <option value="desc">Descending</option>
-      </select>
+      <div>
+        <label>Order:</label>
+        <select
+          value={order}
+          onChange={(e) => dispatch(setOrder(e.target.value))}
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
 
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
@@ -73,12 +79,15 @@ const App = () => {
         </thead>
 
         <tbody>
-          {sortedBooks?.map((book, index) => {
+          {sortedBooks.map((book, index) => {
             const info = book.volumeInfo || {};
+
             return (
               <tr key={index}>
-                <td>{info.title}</td>
-                <td>{info.authors ? info.authors.join(", ") : "N/A"}</td>
+                <td>{info.title || "N/A"}</td>
+                <td>
+                  {info.authors ? info.authors.join(", ") : "N/A"}
+                </td>
                 <td>{info.publisher || "N/A"}</td>
                 <td>
                   {info.industryIdentifiers?.[0]?.identifier || "N/A"}
@@ -89,7 +98,7 @@ const App = () => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
 export default App;
