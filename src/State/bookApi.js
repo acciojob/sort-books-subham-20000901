@@ -18,5 +18,14 @@ export const fetchBooksAPI = async () => {
     }))
   );
 
-  return books.slice(0, 60);
+  // ✅ REMOVE DUPLICATES (IMPORTANT FIX)
+  const booksMap = new Map();
+
+  books.forEach((book) => {
+    if (book.isbn) {
+      booksMap.set(book.isbn, book);
+    }
+  });
+
+  return Array.from(booksMap.values());
 };
