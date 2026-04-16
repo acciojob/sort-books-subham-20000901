@@ -38,67 +38,61 @@ const App = () => {
         : valB.localeCompare(valA);
     });
 
-  return (
-    <div>
-      <h1>Books List</h1>
+ return (
+  <div>
+    <h1>Books List</h1>
 
-      <div>
-        <label>Sort by:</label>
-        <select
-          value={sortBy}
-          onChange={(e) => dispatch(setSortBy(e.target.value))}
-        >
-          <option value="title">Title</option>
-          <option value="author">Author</option>
-          <option value="publisher">Publisher</option>
-        </select>
-      </div>
+    {/* SORT */}
+    <label>Sort by:</label>
+    <select
+      value={sortBy}
+      onChange={(e) => dispatch(setSortBy(e.target.value))}
+    >
+      <option value="title">Title</option>
+      <option value="author">Author</option>
+      <option value="publisher">Publisher</option>
+    </select>
 
-      <div>
-        <label>Order:</label>
-        <select
-          value={order}
-          onChange={(e) => dispatch(setOrder(e.target.value))}
-        >
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </select>
-      </div>
+    {/* ORDER */}
+    <label>Order:</label>
+    <select
+      value={order}
+      onChange={(e) => dispatch(setOrder(e.target.value))}
+    >
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
 
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
+    {loading && <p>Loading...</p>}
+    {error && <p>{error}</p>}
 
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Publisher</th>
-            <th>ISBN</th>
-          </tr>
-        </thead>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Publisher</th>
+          <th>ISBN</th>
+        </tr>
+      </thead>
 
-        <tbody>
-          {sortedBooks.map((book, index) => {
-            const info = book.volumeInfo || {};
-
-            return (
-              <tr key={index}>
-                <td>{info.title || "N/A"}</td>
-                <td>
-                  {info.authors ? info.authors.join(", ") : "N/A"}
-                </td>
-                <td>{info.publisher || "N/A"}</td>
-                <td>
-                  {info.industryIdentifiers?.[0]?.identifier || "N/A"}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+      <tbody>
+        {(sortedBooks || []).slice(0, 60).map((book, index) => {
+          const info = book.volumeInfo || {};
+          return (
+            <tr key={index}>
+              <td>{info.title || "N/A"}</td>
+              <td>{info.authors ? info.authors.join(", ") : "N/A"}</td>
+              <td>{info.publisher || "N/A"}</td>
+              <td>
+                {info.industryIdentifiers?.[0]?.identifier || "N/A"}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+);
 
 export default App;
