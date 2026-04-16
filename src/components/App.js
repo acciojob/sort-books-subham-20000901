@@ -38,9 +38,9 @@ const App = () => {
 
   return (
     <div>
-       <h2>Books List</h2>
+       <h1>Books List</h1>
 
-      {/* MUST MATCH CYPRESS SELECTORS */}
+      <label>Sort By</label>
       <select
         value={sortBy}
         onChange={(e) => dispatch(setSortBy(e.target.value))}
@@ -50,6 +50,7 @@ const App = () => {
         <option value="publisher">Publisher</option>
       </select>
 
+      <label>Order</label>
       <select
         value={order}
         onChange={(e) => dispatch(setOrder(e.target.value))}
@@ -72,7 +73,7 @@ const App = () => {
         </thead>
 
         <tbody>
-          {sortedBooks.map((book, index) => {
+          {sortedBooks?.map((book, index) => {
             const info = book.volumeInfo || {};
             return (
               <tr key={index}>
