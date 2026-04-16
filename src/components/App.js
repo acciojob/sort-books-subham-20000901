@@ -3,96 +3,68 @@ import { useSelector, useDispatch } from "react-redux";
 import { setOrder, setSortBy, fetchBooks } from "../State/bookSlice";
 
 const App = () => {
-  const { list, loading, error, sortBy, order } = useSelector(
+    const dispatch = useDispatch();
+
+  const { books, loading, error, sortBy, order } = useSelector(
     (state) => state.books
   );
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  const sortedBooks = [...(list || [])]
-    .filter((book) => book?.volumeInfo)
-    .sort((a, b) => {
-      const infoA = a.volumeInfo || {};
-      const infoB = b.volumeInfo || {};
+  // sorting logic
+  const sortedBooks = [...books].sort((a, b) => {
+    const valA = a[sortBy]?.toLowerCase() || "";
+    const valB = b[sortBy]?.toLowerCase() || "";
 
-      let valA = "";
-      let valB = "";
+    if (order === "asc") return valA > valB ? 1 : -1;
+    return valA < valB ? 1 : -1;
+  });
 
-      if (sortBy === "title") {
-        valA = infoA.title || "";
-        valB = infoB.title || "";
-      } else if (sortBy === "author") {
-        valA = (infoA.authors && infoA.authors[0]) || "";
-        valB = (infoB.authors && infoB.authors[0]) || "";
-      } else {
-        valA = infoA.publisher || "";
-        valB = infoB.publisher || "";
-      }
+  return (
+    <div>
+      <h1>Books List</h1>
 
-      return order === "asc"
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
-    });
+      {/* MUST be first select */}
+      <select onChange={(e) => dispatch(setSortBy(e.target.value))}>
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="publisher">Publisher</option>
+      </select>
 
- return (
-  <div>
-    <h1>Books List</h1>
+      {/* MUST be second select */}
+      <select onChange={(e) => dispatch(setOrder(e.target.value))}>
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
 
-    {/* SORT */}
-    <label>Sort by:</label>
-    <select
-      value={sortBy}
-      onChange={(e) => dispatch(setSortBy(e.target.value))}
-    >
-      <option value="title">Title</option>
-      <option value="author">Author</option>
-      <option value="publisher">Publisher</option>
-    </select>
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
 
-    {/* ORDER */}
-    <label>Order:</label>
-    <select
-      value={order}
-      onChange={(e) => dispatch(setOrder(e.target.value))}
-    >
-      <option value="asc">Ascending</option>
-      <option value="desc">Descending</option>
-    </select>
+      {/* Cypress expects table */}
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Publisher</th>
+            <th>ISBN</th>
+          </tr>
+        </thead>
 
-    {loading && <p>Loading...</p>}
-    {error && <p>{error}</p>}
-
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Publisher</th>
-          <th>ISBN</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {(sortedBooks || []).slice(0, 60).map((book, index) => {
-          const info = book.volumeInfo || {};
-          return (
+        <tbody>
+          {sortedBooks.map((book, index) => (
             <tr key={index}>
-              <td>{info.title || "N/A"}</td>
-              <td>{info.authors ? info.authors.join(", ") : "N/A"}</td>
-              <td>{info.publisher || "N/A"}</td>
-              <td>
-                {info.industryIdentifiers?.[0]?.identifier || "N/A"}
-              </td>
+              <td>{book.title}</td>
+              <td>{book.author}</td>
+              <td>{book.publisher}</td>
+              <td>{book.isbn}</td>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  </div>
-)};
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )};
 
 export default App;
